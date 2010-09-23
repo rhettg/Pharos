@@ -1,10 +1,10 @@
 from distutils.core import setup
 
 setup(
-    name="webnar", 
+    name="Pharos", 
     version="0.0.1", 
-    scripts=['bin/webnard'],
+    scripts=['bin/pharosd'],
     package_dir={'':'lib'},
-    py_modules=['webnar']
-    # packages="webnar"
+    py_modules=['pharos']
+    # packages="pharos"
 )
