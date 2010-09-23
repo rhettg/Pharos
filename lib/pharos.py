@@ -69,3 +69,7 @@ class MainHandler(tornado.web.RequestHandler):
         for stat_watcher in watch_stats:
             self.write(stat_watcher.value)
             
+application = tornado.web.Application([
+    (r"/", pharos.MainHandler),
+])
+

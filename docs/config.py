@@ -1,6 +1,6 @@
-import webnar
+import pharos
 
-class PageStats(webnar.StatWatcher):
+class PageStats(pharos.StatWatcher):
     interval = 3000
     command = "ssh batch2 \"curl -w \\\"%{time_connect} %{time_starttransfer} %{time_total} (%{http_code})\\\" -s -o /dev/null http://www.yelp.ie/\""
 
