@@ -5,7 +5,11 @@ import tornado.ioloop
 import pharos
 
 if __name__ == '__main__':
-    http_server = tornado.httpserver.HTTPServer(pharos.application)
+    application = tornado.web.Application([
+        (r"/", pharos.MainHandler),
+    ])
+
+    http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(8888)
 
     io_loop = tornado.ioloop.IOLoop.instance()
@@ -15,6 +19,7 @@ if __name__ == '__main__':
     pharos.watch_stats += watch_stats
     
     for stats in watch_stats:
+        print "Adding %r" % stats
         stats.add_to_loop(io_loop)
 
     io_loop.start()

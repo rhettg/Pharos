@@ -24,7 +24,7 @@ class StatWatcher(object):
         self._status = STAT_OK
 
     def handle_output(self, output):
-        pass
+        self._last_updated = datetime.datetime.now()
 
     @property
     def value(self):
@@ -61,15 +61,11 @@ class StatWatcher(object):
 
             io_loop.add_handler(checker.stdout.fileno(), handle_events, io_loop.READ)
 
-        return tornado.ioloop.PeriodicCallback(handle_interval, self.interval, io_loop=io_loop)
+        tornado.ioloop.PeriodicCallback(handle_interval, self.interval, io_loop=io_loop).start()
+
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         global watch_stats
         for stat_watcher in watch_stats:
-            self.write(stat_watcher.value)
-            
-application = tornado.web.Application([
-    (r"/", pharos.MainHandler),
-])
-
+            self.write("%s: %s (%s)" % (stat_watcher.name, stat_watcher.value, stat_watcher.status))
