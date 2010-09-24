@@ -1,13 +1,19 @@
 #!/usr/bin/python
+import sys
+import logging
+
 import tornado.httpserver
 import tornado.ioloop
 
 import pharos
 
 if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+    
     application = tornado.web.Application([
         (r"/", pharos.MainHandler),
-    ])
+    ], debug=True)
 
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(8888)
@@ -16,10 +22,14 @@ if __name__ == '__main__':
 
     execfile("docs/config.py")
 
-    pharos.watch_stats += watch_stats
-    
-    for stats in watch_stats:
-        print "Adding %r" % stats
-        stats.add_to_loop(io_loop)
+    # We're just going to stuff this variable into our application even though tornado knows nothing about it
+    # Allows us to avoid nasty global
+    setattr(application, "metric_watchers", list())
 
+    application.metric_watchers += metric_watchers
+    
+    for watcher in metric_watchers:
+        watcher.add_to_loop(io_loop)
+
+    # Let's get it started!
     io_loop.start()
