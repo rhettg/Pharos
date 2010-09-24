@@ -1,5 +1,3 @@
-import pipes
-
 import pharos
 
 metric_watchers = [

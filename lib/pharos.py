@@ -6,6 +6,7 @@ import socket
 import subprocess
 import datetime
 import logging
+import pipes
 
 import tornado.httpserver
 import tornado.ioloop
