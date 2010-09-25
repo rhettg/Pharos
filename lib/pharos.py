@@ -52,6 +52,7 @@ class MetricWatcher(object):
     @property
     def status(self):
         """Returns one of our STAT_* constants to indicate the how this metric is doing"""
+        raise 'whaaa'
         return STAT_OK
 
     @property
@@ -129,6 +130,7 @@ class CommandMetricWatcher(MetricWatcher):
         self._last_updated = datetime.datetime.now()
 
     def set_status(self, status):
+        log.debug("Setting status for %s : %s", self.name, status)
         if self._status != status:
             self._status = status
             self._status_start = datetime.datetime.now()
@@ -215,6 +217,7 @@ class PageGETMetricWatcher(CommandMetricWatcher):
             self.set_status(STAT_CRITICAL)
             return
         if self._thresholds is None:
+            raise Exception('no thresholds')
             return
             
         min_val, warn_val, crit_val = self._thresholds
@@ -232,6 +235,11 @@ class PageGETMetricWatcher(CommandMetricWatcher):
 
         self.set_status(STAT_OK)
 
+    def handle_exit(self, returncode):
+        self.set_updated()
+
+        self._returncode = returncode
+        
     @property
     def value(self):
         if self._value is None:
@@ -258,9 +266,8 @@ class MainHandler(tornado.web.RequestHandler):
             }
             context['metric_watchers'].append(watcher_dict)
 
-        context['metric_watchers'].append(dict(name="home.com from slw", status_warning=True, value="3.503", duration=format_timedelta(datetime.timedelta(seconds=2))))
-        context['metric_watchers'].append(dict(name="bizdetails.com from slw", status_critical=True, value="13.503", duration=format_timedelta(datetime.timedelta(seconds=80))))
+        # Testing data
+        # context['metric_watchers'].append(dict(name="home.com from slw", status_warning=True, value="3.503", duration=format_timedelta(datetime.timedelta(seconds=2))))
+        # context['metric_watchers'].append(dict(name="bizdetails.com from slw", status_critical=True, value="13.503", duration=format_timedelta(datetime.timedelta(seconds=80))))
         
         self.write(views.dashboard.Dashboard(context=context).render())
-        # for watcher in metric_watchers:
-        #     self.write("%s: %s (%s for %s)<br />" % (watcher.name, watcher.value, watcher.status, format_timedelta(watcher.duration)))
