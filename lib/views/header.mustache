@@ -3,27 +3,25 @@
   <head>
     <title>Pharos</title>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-    <link rel="stylesheet" href="invisibleframework.css" type="text/css" media="screen" />
-    <!-- Some custom things -->
+    <link rel="stylesheet" href="/static/invisibleframework.css" type="text/css" media="screen" />
     <style type="text/css" media="screen">
-      body { padding: 0em 2em 0 2em; background: #333; color: white; }
+      body { padding: 0em 2em 0 2em; background: #333; color: white; font-size: 12px;}
       header nav { background: gray; padding: 0.7em; border-radius: 0.5em;} a { color: orange; }
-      footer { font-size: 0.7em; clear: left; padding-top: 1em;}
+      footer { font-size: 0.7em; clear: left; padding-top: 3em;}
       
       input { width: 40%; }
-      #title { float: left; padding-right: 1em;}
-      #tagline { clear: right; padding: 2.2em 0em 0em 1em;}
+      #title { float: left; padding: 1em 1em 0 0}
+      #tagline { clear: right; padding: 1.85em 0em 0em 1em; color: #555;}
       .metric {padding: .7em 0em 0em 1em; float: left; border: 1px solid #555; width: 350px; margin: 2px 2px 0 0;}
       .metric_list {padding: 2em 0em 1em 1em; clear: right;}
-      .metric_name { float: left; padding-right: 1em; margin: .15em 0em 0em 0em; width: 170px;}
+      .metric_name { float: left; padding-right: 1em; margin: .30em 0em 0em 0em; width: 170px;}
 
-      .metric_value_ok, .metric_value_warning, .metric_value_critical { float: left; padding: .2em .3em .2em .3em; margin: .1em .7em 1em .5em; font-family: monospace; width: 50px;}
+      .metric_value_ok, .metric_value_warning, .metric_value_critical { float: left; padding: .2em .3em .2em .3em; margin: .1em .7em 1em .5em; font-family: monospace; width: 55px;}
       .metric_value_ok { background: green;}
       .metric_value_warning { background: orange;}
       .metric_value_critical { background: red;}
 
-      .metric_duration { float: left; color: #555;}
-
+      .metric_duration { float: left; color: #555; margin-top: .30em;}
 
     </style>
   </head>
@@ -32,5 +30,4 @@
           <div id="title"class="left"><h1>Pharos</h1></div>
           <div id="tagline">Letting you know your shit is fucked</div>
       </header>
-     <br />
-    <section class="w70 left">
+    <section class="">
