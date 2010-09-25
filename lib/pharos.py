@@ -12,6 +12,9 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.httpclient
+import pystache
+
+import views.dashboard
 
 STAT_OK = "ok"
 STAT_WARNING = "warning"
@@ -240,5 +243,24 @@ class PageGETMetricWatcher(CommandMetricWatcher):
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         metric_watchers = getattr(self.application, "metric_watchers", list)
+        context = {
+            'metric_watchers': list()
+        }
+
         for watcher in metric_watchers:
-            self.write("%s: %s (%s for %s)<br />" % (watcher.name, watcher.value, watcher.status, format_timedelta(watcher.duration)))
+            watcher_dict = {
+                "name": watcher.name,
+                "status_ok": watcher.status == STAT_OK,
+                "status_warning": watcher.status == STAT_WARNING,
+                "status_critical": watcher.status == STAT_CRITICAL,
+                "value": watcher.value,
+                "duration": format_timedelta(watcher.duration,)
+            }
+            context['metric_watchers'].append(watcher_dict)
+
+        context['metric_watchers'].append(dict(name="home.com from slw", status_warning=True, value="3.503", duration=format_timedelta(datetime.timedelta(seconds=2))))
+        context['metric_watchers'].append(dict(name="bizdetails.com from slw", status_critical=True, value="13.503", duration=format_timedelta(datetime.timedelta(seconds=80))))
+        
+        self.write(views.dashboard.Dashboard(context=context).render())
+        # for watcher in metric_watchers:
+        #     self.write("%s: %s (%s for %s)<br />" % (watcher.name, watcher.value, watcher.status, format_timedelta(watcher.duration)))

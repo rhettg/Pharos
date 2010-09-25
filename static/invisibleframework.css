@@ -1,0 +1,325 @@
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+summary {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}body {
+  font: normal normal normal 1em 'Lucida Grande', 'Droid Sans', 'DejaVu Sans', Tahoma, sans-serif;
+  font-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font: normal normal bold 1em Helvetica, sans-serif;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.3em;
+}article,
+aside,
+canvas,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}body {
+  min-width: 640px;
+}
+
+.w100 {
+  width: 100%;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+footer,
+div#footer,
+.clearboth {
+  clear: both;
+}.w5 {
+  width: 5%;
+}
+
+.w5.center {
+  margin-left: 47.5%;
+  margin-right: 47.5%;
+}
+
+.w10 {
+  width: 10%;
+}
+
+.w10.center {
+  margin-left: 45%;
+  margin-right: 45%;
+}
+
+.w15 {
+  width: 15%;
+}
+
+.w15.center {
+  margin-left: 42.5%;
+  margin-right: 42.5%;
+}
+
+.w20 {
+  width: 20%;
+}
+
+.w20.center {
+  margin-left: 40%;
+  margin-right: 40%;
+}
+
+.w25 {
+  width: 25%;
+}
+
+.w25.center {
+  margin-left: 37.5%;
+  margin-right: 37.5%;
+}
+
+.w30 {
+  width: 30%;
+}
+
+.w30.center {
+  margin-left: 35%;
+  margin-right: 35%;
+}
+
+.w35 {
+  width: 35%;
+}
+
+.w35.center {
+  margin-left: 32.5%;
+  margin-right: 32.5%;
+}
+
+.w40 {
+  width: 40%;
+}
+
+.w40.center {
+  margin-left: 30%;
+  margin-right: 30%;
+}
+
+.w45 {
+  width: 45%;
+}
+
+.w45.center {
+  margin-left: 27.5%;
+  margin-right: 27.5%;
+}
+
+.w50 {
+  width: 50%;
+}
+
+.w50.center {
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+.w55 {
+  width: 55%;
+}
+
+.w55.center {
+  margin-left: 22.5%;
+  margin-right: 22.5%;
+}
+
+.w60 {
+  width: 60%;
+}
+
+.w60.center {
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.w65 {
+  width: 65%;
+}
+
+.w65.center {
+  margin-left: 17.5%;
+  margin-right: 17.5%;
+}
+
+.w70 {
+  width: 70%;
+}
+
+.w70.center {
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
+.w75 {
+  width: 75%;
+}
+
+.w75.center {
+  margin-left: 12.5%;
+  margin-right: 12.5%;
+}
+
+.w80 {
+  width: 80%;
+}
+
+.w80.center {
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.w85 {
+  width: 85%;
+}
+
+.w85.center {
+  margin-left: 7.5%;
+  margin-right: 7.5%;
+}
+
+.w90 {
+  width: 90%;
+}
+
+.w90.center {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.w95 {
+  width: 95%;
+}
+
+.w95.center {
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+}header,
+div#header {
+  margin: 0.2em 0 1em 0;
+}
+
+p,
+ul,
+ol {
+  margin: 0.1em 0 0.3em 0;
+}
+
+li {
+  margin: 0 0 0.1em 1.5em;
+}
+
+footer,
+div#footer {
+  margin: 1em 0 0.2em 0;
+}

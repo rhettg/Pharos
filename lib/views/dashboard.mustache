@@ -1,0 +1,26 @@
+{{> header}}
+<section class="metric_list">
+    {{#metric_watchers}}
+    <section class="w40 metric">
+        <div class="metric_name">{{name}}</div>
+
+        {{#status_ok}}
+        <div class="metric_value_ok">
+        {{/status_ok}}
+        {{#status_warning}}
+        <div class="metric_value_warning">
+        {{/status_warning}}
+        {{#status_critical}}
+        <div class="metric_value_critical">
+        {{/status_critical}}
+
+            {{value}}
+        </div>
+
+        <div class="metric_duration">
+            <small>(for {{duration}})</small>
+        </div>
+    </section>
+    {{/metric_watchers}}
+</section>
+{{> footer}}
