@@ -100,6 +100,7 @@ class CommandMetricWatcher(MetricWatcher):
         self._returncode = None
         self._status_start = None
         self._status = None
+        self._metric_checker = None
         
         self.set_status(STAT_OK)
 
@@ -135,45 +136,86 @@ class CommandMetricWatcher(MetricWatcher):
             self._status = status
             self._status_start = datetime.datetime.now()
 
-    def handle_output(self, output):
+    def _handle_output(self, output):
         pass
 
-    def handle_exit(self, returncode):
-        self.set_updated()
+    def _handle_returncode(self, returncode):
+        self._returncode = returncode
+
         if returncode == 0:
             self.set_status(STAT_OK)
         else:
             self.set_status(STAT_CRITICAL)
 
-        self._returncode = returncode
+        self.set_updated()
+
+    def handle_exit(self):
+        assert self._metric_checker, "we should have an open checker, or you shouldn't have called me."
+
+        returncode = self._metric_checker.returncode
+        assert returncode is not None, "Process should have exited, or else why are we here"
+
+        log.debug("Process %d exited with value %d", self._metric_checker.pid, returncode)
+
+        self._metric_checker = None
+        self._handle_returncode(returncode)
 
     def add_to_loop(self, io_loop=None):
-        running = False
+
+        # There is some amount of complexity in here that is worth explaining. What we're going to setup here
+        # is a periodic callback in our tornado io loop that will start a process, monitor for output and process
+        # the process's exit. It makes use of closures because we need internal state, but the callbacks don't have
+        # the luxury of arguments. 
+        #
+        # There should be only one process running at once. If it hangs or does something stupid we're not going to start
+        # another, but we will complain in the logs.
+
         def handle_interval():
-            if running:
-                log.warning("Interval while process is still running")
-                return
-
-            checker = subprocess.Popen(self.command, shell=True, stdout=subprocess.PIPE)
+            """Callback for our PeriodicCallback interval. 
+            
+            The only important *state* in this closure is 'self', which wouldn't be available normally.
+            """
+            if self._metric_checker is not None:
+                if self._metric_checker.poll() is not None:
+                    self.handle_exit()
+                else:
+                    log.warning("Interval while process is still running (pid %d)", self._metric_checker.pid)
+                    return
+                
+            checker = self._metric_checker = subprocess.Popen(self.command, shell=True, stdout=subprocess.PIPE)
             log.debug("Started process %d : %s", checker.pid, self.command)
-            def handle_events(fd, events):
-                if events & io_loop.ERROR:
-                    io_loop.remove_handler(checker.stdout.fileno())
-                    if checker.poll() is None:
-                        log.warning("fileno error (%d) but process hasn't exited ?", checker.stdout.fileno())
-                        os.kill(checker.pid, signal.SIGTERM)
-                        # This is dangerous since it can hang. But only in the case of a process that doesn't 
-                        # want to exit for whatever reason.
-                        checker.wait()
 
-                    self.handle_exit(checker.returncode)
+            def check_for_exit():
+                if checker.poll() is not None:
+                    io_loop.remove_handler(checker.stdout.fileno())
+                    self.handle_exit()
+
+            # Mmm.. another closure. This one is for our event processing
+            def handle_events(fd, events):
+                # We need to make sure we still care about the output from this checker
+                if self._metric_checker is None or fd != self._metric_checker.stdout.fileno():
+                    log.warning("IO handler was still active for fd %d", fd)
+                    io_loop.remove_handler(fd)
+                    return
+
+                assert self._metric_checker
 
                 if events & io_loop.READ:
                     output = checker.stdout.read()
-                    self.handle_output(output)
+                    if len(output) == 0:
+                        # On OSX this seems to be what happens rather than receiving an error....strange
+                        #log.warning("Got no output from %d ?", fd)
+                        check_for_exit()
+                    else:
+                        self._handle_output(output)
 
-                return
-
+                if events & io_loop.ERROR:
+                    # We're definetly over this fd, but the process may not have actually exited.
+                    # So we'll remove it from the io loop, and if exit was delayed it will get cleaned up
+                    # on the next interval. In practice this should rarely happen.
+                    io_loop.remove_handler(fd)
+                    check_for_exit()
+                    
             io_loop.add_handler(checker.stdout.fileno(), handle_events, io_loop.READ)
 
         tornado.ioloop.PeriodicCallback(handle_interval, self._interval, io_loop=io_loop).start()
@@ -200,8 +242,9 @@ class PageGETMetricWatcher(CommandMetricWatcher):
 
         return out_cmd
 
-    def handle_output(self, output):
-        super(PageGETMetricWatcher, self).handle_output(output)
+    def _handle_output(self, output):
+        log.debug("Received %r", output)
+        super(PageGETMetricWatcher, self)._handle_output(output)
 
         self._output = output
 
@@ -235,8 +278,10 @@ class PageGETMetricWatcher(CommandMetricWatcher):
 
         self.set_status(STAT_OK)
 
-    def handle_exit(self, returncode):
-        self.set_updated()
+    def _handle_returncode(self, returncode):
+        if returncode != 0:
+            self.set_status(STAT_CRITICAL)
+            self.set_updated()
 
         self._returncode = returncode
         
