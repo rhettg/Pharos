@@ -368,6 +368,10 @@ class PartialMetricHandler(tornado.web.RequestHandler):
         else:
             self.send_error(status_code=404)
         
+        # We found our watcher, which is all well and good, but now we're going to wait until the next
+        # update before we actually return a response. That way the client can have a super fast polling interval and always
+        # have the lastest data
+        
         def complete():
             context = build_watcher_context(watcher)
             self.write(views.metric.Metric(context=context).render())
