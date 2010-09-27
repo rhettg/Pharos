@@ -1,0 +1,25 @@
+<section class="metric" id="metric_{{id}}">
+    <div class="metric_name">{{name}}</div>
+
+    {{#status_ok}}
+    <div class="metric_value_ok">
+    {{/status_ok}}
+    {{#status_warning}}
+    <div class="metric_value_warning">
+    {{/status_warning}}
+    {{#status_critical}}
+    <div class="metric_value_critical">
+    {{/status_critical}}
+
+        {{value}}
+    </div>
+
+    <div class="metric_duration">
+        <small>(for {{duration}})</small>
+    </div>
+    {{#detail}}
+    <div class="metric_detail">
+        {{detail}}
+    </div>
+    {{/detail}}
+</section>

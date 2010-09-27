@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import errno
 import signal
 import socket
@@ -15,6 +16,7 @@ import tornado.httpclient
 import pystache
 
 import views.dashboard
+import views.metric
 
 STAT_OK = "ok"
 STAT_WARNING = "warning"
@@ -48,6 +50,18 @@ class MetricWatcher(object):
 
     def __init__(self, name=None):
         self.name = name
+        self._callbacks = []
+
+    @property
+    def id(self):
+        """Build an id for this metric
+        
+        We'll build an id based on the name by stripping out whitespace and non-alphanumeric characters
+        """
+        id_str = re.sub(r'[\s]', '_', self.name.lower())
+        id_str = re.sub(r'[^\w]', '', id_str)
+        return id_str
+        
 
     @property
     def status(self):
@@ -75,6 +89,22 @@ class MetricWatcher(object):
     def value(self):
         """Provide the actual value for this metric for display"""
         return None
+    
+    @property
+    def detail(self):
+        """Provide more details for drilldown in this stat"""
+        return None
+    
+    def add_update_callback(self, callback):
+        """Calls function 'callback' on the next update to this metric"""
+        self._callbacks.append(callback)
+    
+    def _callback(self):
+        while self._callbacks:
+            try:
+                self._callbacks.pop()()
+            except Exception, e:
+                log.exception("Error calling callback")
     
     def add_to_loop(self, io_loop=None):
         """Do whatever is necessary to set this metric watcher up to actually collect data
@@ -132,6 +162,7 @@ class CommandMetricWatcher(MetricWatcher):
 
     def set_status(self, status):
         log.debug("Setting status for %s : %s", self.name, status)
+        self._callback()
         if self._status != status:
             self._status = status
             self._status_start = datetime.datetime.now()
@@ -230,6 +261,7 @@ class PageGETMetricWatcher(CommandMetricWatcher):
         self._ssh_host = kwargs.pop('ssh_host', None)
         self._thresholds = kwargs.pop('thresholds', None)
         self._value = None
+        self._output = None
         
         super(PageGETMetricWatcher, self).__init__(*args, **kwargs)
     
@@ -292,6 +324,23 @@ class PageGETMetricWatcher(CommandMetricWatcher):
         else:
             return "%.4f" % self._value
 
+    @property
+    def detail(self):
+        return self._output
+
+def build_watcher_context(watcher):
+    context = {
+        "id": watcher.id,
+        "name": watcher.name,
+        "status_ok": watcher.status == STAT_OK,
+        "status_warning": watcher.status == STAT_WARNING,
+        "status_critical": watcher.status == STAT_CRITICAL,
+        "value": watcher.value,
+        "detail": watcher.detail,
+        "duration": format_timedelta(watcher.duration)
+    }
+    
+    return context
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -301,18 +350,27 @@ class MainHandler(tornado.web.RequestHandler):
         }
 
         for watcher in metric_watchers:
-            watcher_dict = {
-                "name": watcher.name,
-                "status_ok": watcher.status == STAT_OK,
-                "status_warning": watcher.status == STAT_WARNING,
-                "status_critical": watcher.status == STAT_CRITICAL,
-                "value": watcher.value,
-                "duration": format_timedelta(watcher.duration,)
-            }
-            context['metric_watchers'].append(watcher_dict)
+            context['metric_watchers'].append(build_watcher_context(watcher))
 
         # Testing data
         # context['metric_watchers'].append(dict(name="home.com from slw", status_warning=True, value="3.503", duration=format_timedelta(datetime.timedelta(seconds=2))))
         # context['metric_watchers'].append(dict(name="bizdetails.com from slw", status_critical=True, value="13.503", duration=format_timedelta(datetime.timedelta(seconds=80))))
         
         self.write(views.dashboard.Dashboard(context=context).render())
+
+class PartialMetricHandler(tornado.web.RequestHandler):
+    @tornado.web.asynchronous
+    def get(self, metric_id):
+        metric_watchers = getattr(self.application, "metric_watchers", list)
+        for watcher in metric_watchers:
+            if watcher.id == metric_id:
+                break
+        else:
+            self.send_error(status_code=404)
+        
+        def complete():
+            context = build_watcher_context(watcher)
+            self.write(views.metric.Metric(context=context).render())
+            self.finish()
+        
+        watcher.add_update_callback(complete)

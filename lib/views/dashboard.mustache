@@ -1,26 +1,34 @@
 {{> header}}
 <section class="metric_list clearboth">
     {{#metric_watchers}}
-    <section class="metric">
-        <div class="metric_name">{{name}}</div>
-
-        {{#status_ok}}
-        <div class="metric_value_ok">
-        {{/status_ok}}
-        {{#status_warning}}
-        <div class="metric_value_warning">
-        {{/status_warning}}
-        {{#status_critical}}
-        <div class="metric_value_critical">
-        {{/status_critical}}
-
-            {{value}}
-        </div>
-
-        <div class="metric_duration">
-            <small>(for {{duration}})</small>
-        </div>
-    </section>
+        {{> metric}}
     {{/metric_watchers}}
 </section>
+<script type="text/javascript">
+function init() {
+    $(".metric").each(function (count, elem) {
+        function update() {
+            $.ajax({
+                url: "/" + elem.id,
+                timeout: 20000,
+                success: function(resp) {
+                    matched = $("#" + elem.id);
+                    matched.hide();
+                    matched.after(resp);
+                    matched.detach();
+                    window.setTimeout(update, 1000);
+                },
+                error: function (req, status, error) {
+                    alert('Failed: ' + status + ' ' + error)
+                }
+            });
+        };
+        update();
+    });
+
+    window.setTimeout(function () {window.location.reload();}, 60000);
+
+};
+$(document).ready(init);
+</script>
 {{> footer}}
