@@ -254,7 +254,7 @@ class CommandMetricWatcher(MetricWatcher):
 
 class PageGETMetricWatcher(CommandMetricWatcher):
     CURL_COMMAND = "curl -w \"%%{time_connect} %%{time_starttransfer} %%{time_total} (%%{http_code})\" -s -o /dev/null %(url)s"
-    SSH_COMMAND = "ssh %(host)s %(command)s"
+    SSH_COMMAND = "ssh %(hostname)s %(command)s"
 
     def __init__(self, *args, **kwargs):
         self._url = kwargs.pop('url', None)
