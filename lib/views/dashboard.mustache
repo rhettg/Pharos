@@ -28,11 +28,10 @@ Pharos.init = function () {
                         matched.detach();
                         Pharos.detailClickForMetric(elem.id);
                     }
-
                     window.setTimeout(update, 1000);
                 },
                 error: function (req, status, error) {
-                    alert('Failed to load: ' + status + ' ' + error);
+                    $("#" + elem.id + ' .metric_value').html("<div class=\"metric_value_critical\">unknown</div>");
                     window.setTimeout(update, 1000);
                 }
             });
