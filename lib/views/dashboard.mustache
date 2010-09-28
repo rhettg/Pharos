@@ -19,7 +19,7 @@ Pharos.init = function () {
         function update() {
             $.ajax({
                 url: "/poll/" + elem.id,
-                timeout: 20000,
+                timeout: 60000,
                 success: function(resp) {
                     matched = $("#" + elem.id);
                     if ($("#" + elem.id + ' .metric_detail').css("display") === "none") {
@@ -32,7 +32,8 @@ Pharos.init = function () {
                     window.setTimeout(update, 1000);
                 },
                 error: function (req, status, error) {
-                    alert('Failed: ' + status + ' ' + error)
+                    alert('Failed to load: ' + status + ' ' + error);
+                    window.setTimeout(update, 1000);
                 }
             });
         };
@@ -40,7 +41,7 @@ Pharos.init = function () {
         Pharos.detailClickForMetric(elem.id);
     });
 
-    window.setTimeout(function () {window.location.reload();}, 60000);
+    // window.setTimeout(function () {window.location.reload();}, 60000);
 };
 
 $(document).ready(Pharos.init);
