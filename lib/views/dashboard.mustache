@@ -5,17 +5,30 @@
     {{/metric_watchers}}
 </section>
 <script type="text/javascript">
-function init() {
+var Pharos = Pharos || {};
+
+Pharos.detailClickForMetric = function (metric_id) {
+    $("#" + metric_id + " .metric_name").click(function (event) {
+        $("#" + metric_id).toggleClass("metric_highlight")
+        $("#" + metric_id + " .metric_detail").slideToggle(50);
+    });
+};
+
+Pharos.init = function () {
     $(".metric").each(function (count, elem) {
         function update() {
             $.ajax({
-                url: "/" + elem.id,
+                url: "/poll/" + elem.id,
                 timeout: 20000,
                 success: function(resp) {
                     matched = $("#" + elem.id);
-                    matched.hide();
-                    matched.after(resp);
-                    matched.detach();
+                    if ($("#" + elem.id + ' .metric_detail').css("display") === "none") {
+                        matched.hide();
+                        matched.after(resp);
+                        matched.detach();
+                        Pharos.detailClickForMetric(elem.id);
+                    }
+
                     window.setTimeout(update, 1000);
                 },
                 error: function (req, status, error) {
@@ -24,11 +37,13 @@ function init() {
             });
         };
         update();
+        Pharos.detailClickForMetric(elem.id);
     });
 
     window.setTimeout(function () {window.location.reload();}, 60000);
-
 };
-$(document).ready(init);
+
+$(document).ready(Pharos.init);
+
 </script>
 {{> footer}}

@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     application = tornado.web.Application([
         (r"/", pharos.MainHandler),
-        (r"/metric_(.*)", pharos.PartialMetricHandler),
+        (r"/poll/metric_(.*)", pharos.PartialMetricHandler),
     ], **app_settings)
 
     http_server = tornado.httpserver.HTTPServer(application)
