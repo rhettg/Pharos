@@ -4,46 +4,4 @@
         {{> metric}}
     {{/metric_watchers}}
 </section>
-<script type="text/javascript">
-var Pharos = Pharos || {};
-
-Pharos.detailClickForMetric = function (metric_id) {
-    $("#" + metric_id + " .metric_name").click(function (event) {
-        $("#" + metric_id).toggleClass("metric_highlight")
-        $("#" + metric_id + " .metric_detail").slideToggle(50);
-    });
-};
-
-Pharos.init = function () {
-    $(".metric").each(function (count, elem) {
-        function update() {
-            $.ajax({
-                url: "/poll/" + elem.id,
-                timeout: 60000,
-                success: function(resp) {
-                    matched = $("#" + elem.id);
-                    if ($("#" + elem.id + ' .metric_detail').css("display") === "none") {
-                        matched.hide();
-                        matched.after(resp);
-                        matched.detach();
-                        Pharos.detailClickForMetric(elem.id);
-                    }
-                    window.setTimeout(update, 1000);
-                },
-                error: function (req, status, error) {
-                    $("#" + elem.id + ' .metric_value').html("<div class=\"metric_value_critical\">unknown</div>");
-                    window.setTimeout(update, 1000);
-                }
-            });
-        };
-        update();
-        Pharos.detailClickForMetric(elem.id);
-    });
-
-    // window.setTimeout(function () {window.location.reload();}, 60000);
-};
-
-$(document).ready(Pharos.init);
-
-</script>
 {{> footer}}
