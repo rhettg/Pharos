@@ -359,7 +359,6 @@ class MainHandler(tornado.web.RequestHandler):
         self.write(views.dashboard.Dashboard(context=context).render())
 
 class PartialMetricHandler(tornado.web.RequestHandler):
-    @tornado.web.asynchronous
     def get(self, metric_id):
         metric_watchers = getattr(self.application, "metric_watchers", list)
         for watcher in metric_watchers:
@@ -368,13 +367,13 @@ class PartialMetricHandler(tornado.web.RequestHandler):
         else:
             self.send_error(status_code=404)
         
-        # We found our watcher, which is all well and good, but now we're going to wait until the next
-        # update before we actually return a response. That way the client can have a super fast polling interval and always
-        # have the lastest data
+		# At one point I had this as an async call. It was very cool. However
+		# it causes the browser to *spin*, meaning it looks like it's always
+		# loading something. I guess this is because the requests would take
+		# one or more seconds and it thought it would be good to let you know
+		# it's slow. Alas, this method isn't too bad either.
+
+        context = build_watcher_context(watcher)
+        self.write(views.metric.Metric(context=context).render())
+        self.finish()
         
-        def complete():
-            context = build_watcher_context(watcher)
-            self.write(views.metric.Metric(context=context).render())
-            self.finish()
-        
-        watcher.add_update_callback(complete)
