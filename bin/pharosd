@@ -11,8 +11,8 @@ import pharos
 
 if __name__ == '__main__':
     parser = optparse.OptionParser()
-    parser.add_option("-c", "--config-file", action="store", dest="config_file",  default="/etc/pharosd", help="Configuration file, default %default")
-    parser.add_option("-s", "--static-path", action="store", dest="static_path", help="Path for static files")
+    parser.add_option("-c", "--config-file", action="store", dest="config_file",  default="docs/pharos/config_sample.py", help="Configuration file (default %default)")
+    parser.add_option("-s", "--static-path", action="store", dest="static_path", default="share/pharos/", help="Path for static files (default %default)")
     parser.add_option("-v", "--verbose", action="count", dest="verbose")
     (options, args) = parser.parse_args()
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     application = tornado.web.Application([
         (r"/", pharos.MainHandler),
-        (r"/poll/metric_(.*)", pharos.PartialMetricHandler),
+        (r"/poll/metric_(.*)", pharos.PollMetricHandler),
     ], **app_settings)
 
     http_server = tornado.httpserver.HTTPServer(application)
