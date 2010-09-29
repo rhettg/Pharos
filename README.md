@@ -11,6 +11,8 @@ Pharos is a dashboard that put up so you can watch, in near real time, how your 
 Example Usage
 ---------------
 
+![Example Dashboard](http://github.com/rhettg/Pharos/raw/master/docs/dashboard.png)
+
 Let's say you run a web site. Let's call that website google.com
 
 You already have ganglia tracking all your systems. Nice graphs of CPU load averages over the last 10 years. You know it's time
@@ -88,5 +90,5 @@ A PageGetMetricWatcher executes 'curl' with some fancy options that give you som
 the page. You can provide threshold values to indicate what a bad response would be.
 
 There are a few options you can tune. Of interest might be `ssh_host` and `interval`. See
-[watcher.py](http://github.com/rhettg/Pharos/pharos/watcher.py) for more details.
+[watcher.py](http://github.com/rhettg/Pharos/blob/master/pharos/watcher.py) for more details.
 
