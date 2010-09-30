@@ -78,5 +78,4 @@ class PollMetricHandler(tornado.web.RequestHandler):
 
         context = build_watcher_context(watcher)
         self.write(metric.Metric(context=context).render())
-        self.finish()
         
