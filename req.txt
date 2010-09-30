@@ -1,5 +1,5 @@
 # We need a custom version of pystache until they accept my patch
-git+ssh://git@github.com/rhettg/pystache.git#egg=pystache
+git+git://github.com/rhettg/pystache.git#egg=pystache
 tornado
 # Tornado seems to need pycurl, but sometimes this breaks
 # pycurl

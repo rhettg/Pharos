@@ -55,9 +55,9 @@ I have a fix. So you should get my version of pystache until my fix is accepted.
 The easiest way to get started is to use excellent python packaging tools 'virtualenv' and 'pip':
 
     virtualenv pharos_env
-    pip install git+ssh://git@github.com/rhettg/Pharos.git#egg=pharos
-    pip install git+ssh://git@github.com/rhettg/pystache.git#egg=pystache
-    pip install tornado
+    pip install -E pharos_env git+git://github.com/rhettg/Pharos.git#egg=pharos
+    pip install -E pharos_env git+git://github.com/rhettg/pystache.git#egg=pystache
+    pip install -E pharos_env tornado
 
 Then you should be able to run the pharos daemon out of the box
 
