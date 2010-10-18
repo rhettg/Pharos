@@ -3,4 +3,4 @@ from watcher import CommandMetricWatcher
 from watcher import PageGETMetricWatcher
 
 from web import MainHandler
-from web import PollMetricHandler
+from web import PollJSONHandler

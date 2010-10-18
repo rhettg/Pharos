@@ -12,7 +12,7 @@
       input { width: 40%; }
       #title { float: left; padding: 1em 1em 0 0}
       #tagline { clear: right; padding: 1.85em 0em 0em 1em; color: #555;}
-      .metric {padding: .7em 0em 0em 1em; float: left; border: 1px solid #555; width: 350px; margin: 2px 2px 0 0;}
+      .metric {padding: .7em 0em 0em 1em; float: left; border: 1px solid #555; width: 350px; margin: 2px 2px 0 0; display:none;}
       .metric_highlight {border: 1px solid #222; background: #555;}
       .metric_list {padding: 2em 0em 1em 1em; clear: right;}
       .metric_name { float: left; padding-right: 1em; margin: .30em 0em 0em 0em; width: 170px; cursor: pointer;}
@@ -29,40 +29,66 @@
     <script type="text/javascript">
     var Pharos = Pharos || {};
 
-    Pharos.detailClickForMetric = function (metric_id) {
-        $("#" + metric_id + " .metric_name").click(function (event) {
-            $("#" + metric_id).toggleClass("metric_highlight")
-            $("#" + metric_id + " .metric_detail").slideToggle(50);
-        });
-    };
+	Pharos.updateMetric = function (metric_spec) {
+		var elem_id = "metric_" + metric_spec.id;
+		
+		// And start updating values
+		var $metric = $("#" + elem_id);
+
+		// We don't update highlighted metrics
+		if ($metric.hasClass("metric_highlight")) {
+			return
+		}
+
+		$metric.find("div.metric_duration").html("<small>(for " + metric_spec.duration + ")</small>");
+		$metric.find("div.metric_detail").html(metric_spec.detail);
+
+
+		var $value = $metric.find("div.metric_value");
+		$value.html(metric_spec.value);
+
+		$value.removeClass("metric_value_ok metric_value_warning metric_value_critical");
+
+		// And then update the value class if a stat has changed
+		if (metric_spec.status_ok) {
+			$value.addClass("metric_value_ok");
+		}
+		else if (metric_spec.status_warning) {
+			$value.addClass("metric_value_warning");
+		}
+		else if (metric_spec.status_critical) {
+			$value.addClass("metric_value_critical");
+		}
+		else {
+			alert("unknown status");
+		}
+		
+		// We're possible hidden
+		$("#" + elem_id + ":hidden").show();
+		
+	};
+
+	Pharos.triggerUpdateResponse = function (response) {
+		$.each(response.metric_watchers, function (k, v) {Pharos.updateMetric(v);});
+		// And then do it all over again
+		window.setTimeout(Pharos.triggerUpdate, 1000);
+	};
+
+	Pharos.triggerUpdate = function () {
+		$.getJSON("/poll/json", Pharos.triggerUpdateResponse);
+	};
+
+	Pharos.initMetricClick = function (val, elem) {
+		$(elem).find(".metric_name").click(function (event) {
+		 	$(elem).toggleClass("metric_highlight");
+		 	$(elem).find('div.metric_detail').slideToggle(50);
+		});
+	}
 
     Pharos.init = function () {
-        $(".metric").each(function (count, elem) {
-            function update() {
-                $.ajax({
-                    url: "/poll/" + elem.id,
-                    timeout: 60000,
-                    success: function(resp) {
-                        matched = $("#" + elem.id);
-                        if ($("#" + elem.id + ' .metric_detail').css("display") === "none") {
-                            matched.hide();
-                            matched.after(resp);
-                            matched.detach();
-                            Pharos.detailClickForMetric(elem.id);
-                        }
-                        window.setTimeout(update, 1000);
-                    },
-                    error: function (req, status, error) {
-                        $("#" + elem.id + ' .metric_value').html("<div class=\"metric_value_critical\">unknown</div>");
-                        window.setTimeout(update, 1000);
-                    }
-                });
-            };
-            update();
-            Pharos.detailClickForMetric(elem.id);
-        });
+		$(".metric").each(Pharos.initMetricClick);
 
-        // window.setTimeout(function () {window.location.reload();}, 60000);
+		Pharos.triggerUpdate();
     };
 
     $(document).ready(Pharos.init);

@@ -1,3 +1,4 @@
+import time
 import re
 import datetime
 import logging
@@ -55,27 +56,24 @@ class MainHandler(tornado.web.RequestHandler):
             context['metric_watchers'].append(build_watcher_context(watcher))
 
         # Testing data
-        # context['metric_watchers'].append(dict(name="home.com from slw", status_warning=True, value="3.503", duration=format_timedelta(datetime.timedelta(seconds=2))))
-        # context['metric_watchers'].append(dict(name="bizdetails.com from slw", status_critical=True, value="13.503", duration=format_timedelta(datetime.timedelta(seconds=80))))
+        # context['metric_watchers'].append(dict(id="home_com_slw", name="home.com from slw", status_warning=True, value="3.503", detail="it starts here", duration=format_timedelta(datetime.timedelta(seconds=2))))
+        # context['metric_watchers'].append(dict(id="bizdetails_com_slw", name="bizdetails.com from slw", status_critical=True, value="13.503", detail="and finishes over here", duration=format_timedelta(datetime.timedelta(seconds=80))))
         
         self.write(dashboard.Dashboard(context=context).render())
 
 
-class PollMetricHandler(tornado.web.RequestHandler):
-    def get(self, metric_id):
+class PollJSONHandler(tornado.web.RequestHandler):
+    def get(self):
         metric_watchers = getattr(self.application, "metric_watchers", list)
-        for watcher in metric_watchers:
-            if watcher.id == metric_id:
-                break
-        else:
-            self.send_error(status_code=404)
-        
-        # At one point I had this as an async call. It was very cool. However
-        # it causes the browser to *spin*, meaning it looks like it's always
-        # loading something. I guess this is because the requests would take
-        # one or more seconds and it thought it would be good to let you know
-        # it's slow. Alas, this method isn't too bad either.
+        context = {
+            'metric_watchers': list()
+        }
 
-        context = build_watcher_context(watcher)
-        self.write(metric.Metric(context=context).render())
-        
+        for watcher in metric_watchers:
+            context['metric_watchers'].append(build_watcher_context(watcher))
+
+        # Testing data
+        # context['metric_watchers'].append(dict(id="home_com_slw", name="home.com from slw", status_ok=True, value="3.503", duration=format_timedelta(datetime.timedelta(seconds=300)), detail="some stuff"))
+        # context['metric_watchers'].append(dict(id="bizdetails_com_slw", name="bizdetails.com from slw", status_ok=True, value="10.503", duration=format_timedelta(datetime.timedelta(seconds=80)), detail="some other stuff"))
+        self.write(context)
+    

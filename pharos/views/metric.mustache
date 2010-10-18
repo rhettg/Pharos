@@ -2,15 +2,14 @@
     <div class="metric_name">{{name}}</div>
 
     {{#status_ok}}
-    <div class="metric_value_ok">
+    <div class="metric_value metric_value_ok">
     {{/status_ok}}
     {{#status_warning}}
-    <div class="metric_value_warning">
+    <div class="metric_value metric_value_warning">
     {{/status_warning}}
     {{#status_critical}}
-    <div class="metric_value_critical">
+    <div class="metric_value metric_value_critical">
     {{/status_critical}}
-
         {{value}}
     </div>
 
