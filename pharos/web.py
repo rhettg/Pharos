@@ -49,7 +49,8 @@ class MainHandler(tornado.web.RequestHandler):
     def get(self):
         metric_watchers = getattr(self.application, "metric_watchers", list)
         context = {
-            'metric_watchers': list()
+            'metric_watchers': list(),
+            'page_title': self.application.page_title,
         }
 
         for watcher in metric_watchers:

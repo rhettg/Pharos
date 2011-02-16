@@ -41,11 +41,14 @@ if __name__ == '__main__':
 
     io_loop = tornado.ioloop.IOLoop.instance()
 
+    page_title = "Pharos"
+
     execfile(options.config_file)
 
     # We're just going to stuff this variable into our application even though tornado knows nothing about it
     # Allows us to avoid nasty global
     setattr(application, "metric_watchers", list())
+    setattr(application, "page_title", page_title)
 
     application.metric_watchers += metric_watchers
     
