@@ -14,6 +14,8 @@ if __name__ == '__main__':
     parser.add_option("-c", "--config-file", action="store", dest="config_file",  default="docs/pharos/config_sample.py", help="Configuration file (default %default)")
     parser.add_option("-s", "--static-path", action="store", dest="static_path", default="share/pharos/", help="Path for static files (default %default)")
     parser.add_option("-v", "--verbose", action="count", dest="verbose")
+    parser.add_option("-P", "--port", action="store", dest="port", type="int", default=8811)
+
     (options, args) = parser.parse_args()
 
     if options.verbose > 1:
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     ], **app_settings)
 
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(8888)
+    http_server.listen(options.port)
 
     io_loop = tornado.ioloop.IOLoop.instance()
 
