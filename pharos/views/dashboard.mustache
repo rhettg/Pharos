@@ -1,7 +1,10 @@
 {{> header}}
-<section class="metric_list clearboth">
-    {{#metric_watchers}}
-        {{> metric}}
-    {{/metric_watchers}}
-</section>
+{{#metric_watcher_sets}}
+	<section class="metric_list clearboth">
+		<h2>{{name}}</h2>
+	    {{#metric_watchers}}
+	        {{> metric}}
+	    {{/metric_watchers}}
+	</section>
+{{/metric_watcher_sets}}
 {{> footer}}

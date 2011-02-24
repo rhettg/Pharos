@@ -37,6 +37,11 @@ def format_timedelta(delta):
 
     return "a moment"
 
+class WatcherSet(object):
+    def __init__(self, name, watchers):
+        self.name = name
+        self.watchers = watchers
+
 
 class MetricWatcher(object):
     """base interface for what pharos will use to collect and monitor metrics"""

@@ -41,19 +41,21 @@ if __name__ == '__main__':
 
     io_loop = tornado.ioloop.IOLoop.instance()
 
-    page_title = "Pharos"
+    page_title = None
 
     execfile(options.config_file)
 
     # We're just going to stuff this variable into our application even though tornado knows nothing about it
     # Allows us to avoid nasty global
-    setattr(application, "metric_watchers", list())
-    setattr(application, "page_title", page_title)
+    setattr(application, "metric_watcher_sets", list())
+    if page_tag is not None:
+        setattr(application, "page_tag", page_tag)
 
-    application.metric_watchers += metric_watchers
+    application.metric_watcher_sets += metric_watcher_sets
     
-    for watcher in metric_watchers:
-        watcher.add_to_loop(io_loop)
+    for watcher_set in metric_watcher_sets:
+        for watcher in watcher_set.watchers:
+            watcher.add_to_loop(io_loop)
 
     # Let's get it started!
     io_loop.start()
