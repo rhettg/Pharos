@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     io_loop = tornado.ioloop.IOLoop.instance()
 
-    page_title = None
+    page_tag = None
 
     execfile(options.config_file)
 
